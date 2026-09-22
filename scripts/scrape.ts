@@ -82,7 +82,9 @@ function findNearLabel(html: string, labels: string[]): number | undefined {
 }
 
 async function fetchIpoFromNse(slug: string, companyName: string): Promise<LatestIpo> {
-  const result: LatestIpo = {};
+  const result: LatestIpo = {
+    failed: { gmp: false, subscription: false },
+  };
   const current = await fetchJson<unknown>(
     "https://www.nseindia.com/api/ipo-current-issue",
     { headers: { referer: "https://www.nseindia.com/" } },

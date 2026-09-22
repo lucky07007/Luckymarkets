@@ -1,0 +1,35 @@
+name: Refresh market data
+
+on:
+  schedule:
+    - cron: "*/30 * * * *"
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+jobs:
+  scrape:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - run: npm install
+      - run: npm run scrape
+
+      - name: Commit data updates
+        run: |
+          git config user.name "luckymarkets-bot"
+          git config user.email "bot@luckymarkets.in"
+          git add lib/data
+          if git diff --staged --quiet; then
+            echo "No data changes to commit."
+          else
+            git commit -m "chore: refresh market data [automated]"
+            git push
+          fi
